@@ -68,10 +68,10 @@ def sendData():
                 cur.execute(query, [Json(data)])
                 message = cur.fetchone()
                 conn.commit()
+        return {"ok": True}
     except:
         return {"ok": False}
 
-    return {"ok": True}
 
 
 if __name__ == "__main__":
