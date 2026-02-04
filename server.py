@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import psycopg2
 import pandas as pd
+from psycopg2.extras import Json
 
 
 load_dotenv()
@@ -23,8 +24,6 @@ config = {
     "host": HOST,
     "port": PORT
 }
-
-print(config)
 
 app = Flask(__name__)
 CORS(app)
@@ -56,6 +55,23 @@ def getSample():
         pass
 
     return {"text_id": row[0], "text": row[1]} if row is not None else {"text_id": None, "text": None}
+
+
+@app.route("/sendData", methods=["POST"])
+def sendData():
+    data = request.json
+
+    try:
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
+                query = "SELECT update_evaluation_from_json(%s)"
+                cur.execute(query, [Json(data)])
+                message = cur.fetchone()
+                conn.commit()
+    except:
+        return {"ok": False}
+
+    return {"ok": True}
 
 
 if __name__ == "__main__":
