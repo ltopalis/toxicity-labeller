@@ -5,3 +5,4 @@ openpyxl
 python-dotenv
 flask
 flask-cors
+gunicorn
