@@ -1,0 +1,7 @@
+psycopg2-binary
+pandas
+customtkinter
+openpyxl
+python-dotenv
+flask
+flask-cors
