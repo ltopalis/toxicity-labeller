@@ -44,10 +44,10 @@ def getSample():
                 query = "SELECT text_id, text FROM evaluation"
                 if lang is not None:
                     query += " WHERE lang = %s"
-                    query += " GROUP BY text_id, times_evaluated HAVING times_evaluated = MIN(times_evaluated) LIMIT 1"
+                    query += " GROUP BY text_id, times_evaluated HAVING times_evaluated = MIN(times_evaluated)"
                     cur.execute(query, (lang,))
                 else:
-                    query += " GROUP BY text_id, times_evaluated HAVING times_evaluated = MIN(times_evaluated) LIMIT 1"
+                    query += " GROUP BY text_id, times_evaluated HAVING times_evaluated = MIN(times_evaluated)"
                     cur.execute(query)
                 row = cur.fetchone()
 
