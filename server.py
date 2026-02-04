@@ -42,7 +42,7 @@ def getSample():
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
                 query = "SELECT text_id, text FROM evaluation"
-                if lang is not None:
+                if lang != "null":
                     query += " WHERE lang = %s"
                     query += " GROUP BY text_id, times_evaluated HAVING times_evaluated = MIN(times_evaluated)"
                     cur.execute(query, (lang,))
