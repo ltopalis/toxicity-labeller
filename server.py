@@ -41,14 +41,13 @@ def getSample():
     try:
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                query = "SELECT text_id, text FROM evaluation"
-                if lang != "null":
-                    query += " WHERE lang = %s"
-                    query += " GROUP BY text_id, times_evaluated HAVING times_evaluated = MIN(times_evaluated)"
+                if lang and lang != "null":
+                    query = "SELECT text_id, text FROM evaluation WHERE lang = %s ORDER BY times_evaluated ASC, RANDOM() LIMIT 1"
                     cur.execute(query, (lang,))
                 else:
-                    query += " GROUP BY text_id, times_evaluated HAVING times_evaluated = MIN(times_evaluated)"
+                    query = "SELECT text_id, text FROM evaluation ORDER BY times_evaluated ASC, RANDOM() LIMIT 1"
                     cur.execute(query)
+
                 row = cur.fetchone()
 
     except:
@@ -68,10 +67,9 @@ def sendData():
                 cur.execute(query, [Json(data)])
                 message = cur.fetchone()
                 conn.commit()
-        return {"ok": True}
+        return {"ok": True, "message": message}
     except:
         return {"ok": False}
-
 
 
 if __name__ == "__main__":
