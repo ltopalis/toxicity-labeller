@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const format = require("pg-format");
 
 const allowedOrigins = [
   "http://localhost:3000/",
@@ -9,7 +10,8 @@ const allowedOrigins = [
 ];
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -75,6 +77,72 @@ app.post("/sendData", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.json({ ok: false });
+  }
+});
+
+const getToxicityJSON = (val) => {
+  const base = { neutral: 0, implicit: 0, explicit: 0 };
+  const key = val?.toLowerCase().trim();
+  if (base.hasOwnProperty(key)) base[key] = 3;
+  return JSON.stringify(base);
+};
+
+const getTargetJSON = (val) => {
+  const base = { Group: 0, None: 0, Individual: 0, Other: 0 };
+  const key = val
+    ? val.charAt(0).toUpperCase() + val.slice(1).toLowerCase().trim()
+    : "None";
+  if (base.hasOwnProperty(key)) {
+    base[key] = 3;
+  } else {
+    base["None"] = 3;
+  }
+  return JSON.stringify(base);
+};
+
+const getBiasJSON = (val) => {
+  const base = {
+    "Appearance / Physical Bias": 0,
+    "Cognitive / Intelligence bias": 0,
+    "Gender / Identity bias": 0,
+    "Institutional / Media Bias": 0,
+    "Migration /  Ethnic Bias": 0,
+    None: 0,
+    "Political / Ideological Bias": 0,
+    "Religious Bias": 0,
+    "Socioeconomic / Educational Bias": 0,
+  };
+  if (base.hasOwnProperty(val)) {
+    base[val] = 3;
+  } else {
+    base["None"] = 3;
+  }
+  return JSON.stringify(base);
+};
+
+app.post("/upload-data", async (req, res) => {
+  const data = req.body;
+
+  try {
+    const values = data.map((row) => [
+      row.text_id,
+      row.text,
+      row.lang,
+      getToxicityJSON(row.toxicity),
+      getTargetJSON(row.target_type),
+      getBiasJSON(row.bias_type),
+    ]);
+
+    const sql = format(
+      "INSERT INTO evaluation (text_id, text, lang, toxicity, target_type, bias_type) VALUES %L ON CONFLICT (text_id) DO NOTHING",
+      values,
+    );
+
+    await pool.query(sql);
+    res.status(200).json({ message: `Done! Processed ${data.length} rows.` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 });
 
