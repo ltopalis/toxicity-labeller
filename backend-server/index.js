@@ -157,6 +157,31 @@ app.post("/upload-data", async (req, res) => {
   }
 });
 
+app.get("/getStats", async (req, res) => {
+  let sql =
+    "SELECT COUNT(*) FROM evaluation WHERE lang = 'gr' and times_evaluation = 0";
+  const gr = await pool.query(sql);
+
+  sql =
+    "SELECT COUNT(*) FROM evaluation WHERE lang = 'gr' and times_evaluation != 0";
+  const ngr = await pool.query(sql);
+
+  sql =
+    "SELECT COUNT(*) FROM evaluation WHERE lang = 'de' and times_evaluation = 0";
+  const de = await pool.query(sql);
+
+  sql =
+    "SELECT COUNT(*) FROM evaluation WHERE lang = 'de' and times_evaluation != 0";
+  const nde = await pool.query(sql);
+
+  res.json({
+    gr_labelled: gr,
+    gr_not_labelled: ngr,
+    de_labelled: de,
+    de_not_labelled: nde,
+  });
+});
+
 app.listen(3000, "0.0.0.0", () => {
   console.log("Server is running on http://0.0.0.0:3000");
 });
