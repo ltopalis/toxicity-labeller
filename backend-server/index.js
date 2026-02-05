@@ -145,7 +145,7 @@ app.post("/upload-data", async (req, res) => {
     ]);
 
     const sql = format(
-      "INSERT INTO evaluation (text_id, text, lang, toxicity, target_type, bias_type) VALUES %L ON CONFLICT (text_id) DO NOTHING",
+      "INSERT INTO evaluation (text_id, text, lang, times_evaluated, toxicity, target_type, bias_type) VALUES %L ON CONFLICT (text_id) DO NOTHING",
       values,
     );
 
