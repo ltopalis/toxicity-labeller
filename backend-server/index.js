@@ -171,7 +171,6 @@ app.get("/getStats", async (req, res) => {
     const result = await pool.query(sql);
     const stats = result.rows[0];
 
-    // Στέλνουμε τα ονόματα ακριβώς όπως τα περιμένει η Swift
     res.json({
       gr: parseInt(stats.gr),
       ngr: parseInt(stats.ngr),
@@ -183,6 +182,34 @@ app.get("/getStats", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
+app.get("/getAllData", async (req, res) => {
+  try {
+    const sql =
+      "SELECT text_id, text, toxicity, bias_type, target_type FROM evaluation WHERE times_evaluated != 0";
+    const result = await pool.query(sql);
+
+    const processedRows = result.rows.map((row) => {
+      return {
+        text_id: row.text_id,
+        text: row.text,
+        toxicity: extractScore(row.toxicity),
+        bias_type: extractScore(row.bias_type),
+        target_type: extractScore(row.target_type),
+      };
+    });
+
+    res.json(processedRows);
+  } catch (err) {
+    console.error("❌ Error:", err);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
+function extractScore(value) {
+  if (!value) return null;
+  return Object.keys(value).reduce((a, b) => (value[a] > value[b] ? a : b));
+}
 
 app.listen(3000, "0.0.0.0", () => {
   console.log("Server is running on http://0.0.0.0:3000");
