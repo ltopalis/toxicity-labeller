@@ -1,0 +1,21 @@
+.eval-section {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    color: #495057;
+}
+
+.btn-check+.btn {
+    width: 100%;
+    margin-bottom: 10px;
+    transition: 0.2s;
+}
+
+#text-to-eval {
+    font-size: 1.5rem;
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    margin: 20px 0;
+}

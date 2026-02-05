@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_USER: example
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d/
+    ports:
+      - 5432:5432
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.nodejs
+    container_name: toxicityServer
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend-server:/server
+      - /server/node_modules
+    environment:
+      - NODE_ENV=development
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080

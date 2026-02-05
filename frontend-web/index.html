@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="el">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toxicity Evaluation</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="./index.css">
+
+    <script src="./index.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-light bg-light mb-4 shadow-sm">
+        <div class="container-xxl d-flex justify-content-between align-items-center">
+            <span class="navbar-brand fw-bold text-secondary mb-0">
+                Toxicity
+            </span>
+
+            <ul class="navbar-nav flex-row align-items-center">
+                <li class="nav-item">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#modalWindow">
+                        <i class="bi bi-gear-fill"></i>
+                    </button>
+
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container px-4">
+        <form id="evaluationForm">
+
+            <div class="row">
+                <div class="col-md-12 text-center" id="text-to-eval">
+                    Loading....
+                </div>
+            </div>
+
+            <h5 class="eval-section border-bottom pb-2">Toxicity Level</h5>
+            <div class="row">
+                <div class="col-6 col-md-4">
+                    <input type="radio" class="btn-check" name="toxicity" id="tox_1" value="Neutral" checked>
+                    <label class="btn btn-outline-success" for="tox_1">Neutral</label>
+                </div>
+                <div class="col-6 col-md-4">
+                    <input type="radio" class="btn-check" name="toxicity" id="tox_2" value="Implicit">
+                    <label class="btn btn-outline-warning" for="tox_2">Implicit</label>
+                </div>
+                <div class="col-6 col-md-4">
+                    <input type="radio" class="btn-check" name="toxicity" id="tox_3" value="Explicit">
+                    <label class="btn btn-outline-danger" for="tox_3">Explicit</label>
+                </div>
+            </div>
+
+            <h5 class="eval-section border-bottom pb-2">Bias Type</h5>
+            <div class="row">
+                <div class="col-6 col-md-4">
+                    <input type="radio" class="btn-check" name="bias_type" id="bias_1"
+                        value="Appearance / Physical Bias">
+                    <label class="btn btn-outline-primary" for="bias_1">Appearance / Physical Bias</label>
+                </div>
+                <div class="col-6 col-md-4">
+                    <input type="radio" class="btn-check" name="bias_type" id="bias_2"
+                        value="Cognitive / Intelligence bias">
+                    <label class="btn btn-outline-primary" for="bias_2">Cognitive / Intelligence bias</label>
+                </div>
+                <div class="col-6 col-md-4">
+                    <input type="radio" class="btn-check" name="bias_type" id="bias_3" value="Gender / Identity bias">
+                    <label class="btn btn-outline-primary" for="bias_3">Gender / Identity bias</label>
+                </div>
+                <div class="col-6 col-md-4">
+                    <input type="radio" class="btn-check" name="bias_type" id="bias_4"
+                        value="Institutional / Media Bias">
+                    <label class="btn btn-outline-primary" for="bias_4">Institutional / Media Bias</label>
+                </div>
+                <div class="col-6 col-md-4">
+                    <input type="radio" class="btn-check" name="bias_type" id="bias_5" value="Migration / Ethnic Bias">
+                    <label class="btn btn-outline-primary" for="bias_5">Migration / Ethnic Bias</label>
+                </div>
+                <div class="col-6 col-md-4">
+                    <input type="radio" class="btn-check" name="bias_type" id="bias_6" value="None" checked>
+                    <label class="btn btn-outline-primary" for="bias_6">None</label>
+                </div>
+                <div class="col-6 col-md-4">
+                    <input type="radio" class="btn-check" name="bias_type" id="bias_7"
+                        value="Political / Ideological Bias">
+                    <label class="btn btn-outline-primary" for="bias_7">Political / Ideological Bias</label>
+                </div>
+                <div class="col-6 col-md-4">
+                    <input type="radio" class="btn-check" name="bias_type" id="bias_8" value="Religious Bias">
+                    <label class="btn btn-outline-primary" for="bias_8">Religious Bias</label>
+                </div>
+                <div class="col-6 col-md-4">
+                    <input type="radio" class="btn-check" name="bias_type" id="bias_9"
+                        value="Socioeconomic / Educational Bias">
+                    <label class="btn btn-outline-primary" for="bias_9">Socioeconomic / Educational Bias</label>
+                </div>
+            </div>
+
+            <h5 class="eval-section border-bottom pb-2">Target Type</h5>
+            <div class="row">
+                <div class="col-6 col-md-3">
+                    <input type="radio" class="btn-check" name="target_type" id="target_1" value="None" checked>
+                    <label class="btn btn-outline-info" for="target_1">None</label>
+                </div>
+                <div class="col-6 col-md-3">
+                    <input type="radio" class="btn-check" name="target_type" id="target_2" value="Individual">
+                    <label class="btn btn-outline-info" for="target_2">Individual</label>
+                </div>
+                <div class="col-6 col-md-3">
+                    <input type="radio" class="btn-check" name="target_type" id="target_3" value="Group">
+                    <label class="btn btn-outline-info" for="target_3">Group</label>
+                </div>
+                <div class="col-6 col-md-3">
+                    <input type="radio" class="btn-check" name="target_type" id="target_4" value="Other">
+                    <label class="btn btn-outline-info" for="target_4">Other</label>
+                </div>
+            </div>
+
+            <div class="row mt-5 mb-5">
+                <div class="col-12 text-center">
+                    <button type="button" id="submitBtn" class="btn btn-dark btn-lg px-5">Submit Evaluation</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalWindow" tabindex="-1" aria-labelledby="windowModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="windowModalLabel">Επίλεξε Γλώσσα</h1>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="btn-group-vertical w-100" role="group" aria-label="Language selection">
+                        <input type="radio" class="btn-check" name="langOption" id="lang_all" value="all">
+                        <label class="btn btn-outline-primary mb-2" for="lang_all">Όλα</label>
+
+                        <input type="radio" class="btn-check" name="langOption" id="lang_gr" value="gr">
+                        <label class="btn btn-outline-primary mb-2" for="lang_gr">Ελληνικά (GR)</label>
+
+                        <input type="radio" class="btn-check" name="langOption" id="lang_de" value="de">
+                        <label class="btn btn-outline-primary mb-2" for="lang_de">Γερμανικά (DE)</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                        onclick="cancelLanguage()">Ακύρωση</button>
+                    <button type="button" class="btn btn-success" onclick="saveLanguage()">Αποθήκευση Αλλαγών</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
