@@ -158,28 +158,30 @@ app.post("/upload-data", async (req, res) => {
 });
 
 app.get("/getStats", async (req, res) => {
-  let sql =
-    "SELECT COUNT(*) FROM evaluation WHERE lang = 'gr' and times_evaluated = 0";
-  const gr = await pool.query(sql);
+  try {
+    const sql = `
+      SELECT 
+        COUNT(*) FILTER (WHERE lang = 'gr' AND times_evaluated != 0) as gr,
+        COUNT(*) FILTER (WHERE lang = 'gr' AND times_evaluated = 0) as ngr,
+        COUNT(*) FILTER (WHERE lang = 'de' AND times_evaluated != 0) as de,
+        COUNT(*) FILTER (WHERE lang = 'de' AND times_evaluated = 0) as nde
+      FROM evaluation
+    `;
 
-  sql =
-    "SELECT COUNT(*) FROM evaluation WHERE lang = 'gr' and times_evaluated != 0";
-  const ngr = await pool.query(sql);
+    const result = await pool.query(sql);
+    const stats = result.rows[0];
 
-  sql =
-    "SELECT COUNT(*) FROM evaluation WHERE lang = 'de' and times_evaluated = 0";
-  const de = await pool.query(sql);
-
-  sql =
-    "SELECT COUNT(*) FROM evaluation WHERE lang = 'de' and times_evaluated != 0";
-  const nde = await pool.query(sql);
-
-  res.json({
-    gr_labelled: gr,
-    gr_not_labelled: ngr,
-    de_labelled: de,
-    de_not_labelled: nde,
-  });
+    // Στέλνουμε τα ονόματα ακριβώς όπως τα περιμένει η Swift
+    res.json({
+      gr: parseInt(stats.gr),
+      ngr: parseInt(stats.ngr),
+      de: parseInt(stats.de),
+      nde: parseInt(stats.nde),
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
 });
 
 app.listen(3000, "0.0.0.0", () => {
