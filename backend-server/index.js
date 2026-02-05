@@ -123,6 +123,8 @@ const getBiasJSON = (val) => {
 app.post("/upload-data", async (req, res) => {
   const data = req.body;
 
+  console.log(data);
+
   try {
     const values = data.map((row) => [
       row.text_id,
