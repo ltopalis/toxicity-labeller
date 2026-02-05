@@ -1,7 +1,6 @@
 "use strict";
 
-// const server_url = "https://toxicity-backend.onrender.com/";
-const server_url = "http://localhost:3000/";
+const server_url = "https://toxicity-backend.onrender.com/";
 
 localStorage.setItem("selectedLang", "null");
 
