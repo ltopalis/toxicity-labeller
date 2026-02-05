@@ -129,9 +129,6 @@ const getTimesEvaluated = (val) => {
 
 app.post("/upload-data", async (req, res) => {
   const data = req.body;
-  console.log("hi");
-
-  console.log(data);
 
   try {
     const values = data.map((row) => [
