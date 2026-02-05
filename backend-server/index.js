@@ -159,19 +159,19 @@ app.post("/upload-data", async (req, res) => {
 
 app.get("/getStats", async (req, res) => {
   let sql =
-    "SELECT COUNT(*) FROM evaluation WHERE lang = 'gr' and times_evaluation = 0";
+    "SELECT COUNT(*) FROM evaluation WHERE lang = 'gr' and times_evaluated = 0";
   const gr = await pool.query(sql);
 
   sql =
-    "SELECT COUNT(*) FROM evaluation WHERE lang = 'gr' and times_evaluation != 0";
+    "SELECT COUNT(*) FROM evaluation WHERE lang = 'gr' and times_evaluated != 0";
   const ngr = await pool.query(sql);
 
   sql =
-    "SELECT COUNT(*) FROM evaluation WHERE lang = 'de' and times_evaluation = 0";
+    "SELECT COUNT(*) FROM evaluation WHERE lang = 'de' and times_evaluated = 0";
   const de = await pool.query(sql);
 
   sql =
-    "SELECT COUNT(*) FROM evaluation WHERE lang = 'de' and times_evaluation != 0";
+    "SELECT COUNT(*) FROM evaluation WHERE lang = 'de' and times_evaluated != 0";
   const nde = await pool.query(sql);
 
   res.json({
