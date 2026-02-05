@@ -120,6 +120,13 @@ const getBiasJSON = (val) => {
   return JSON.stringify(base);
 };
 
+const getTimesEvaluated = (val) => {
+  const base = { neutral: 0, implicit: 0, explicit: 0 };
+  const key = val?.toLowerCase().trim();
+  if (base.hasOwnProperty(key)) return 1;
+  return 0;
+};
+
 app.post("/upload-data", async (req, res) => {
   const data = req.body;
   console.log("hi");
@@ -131,6 +138,7 @@ app.post("/upload-data", async (req, res) => {
       row.text_id,
       row.text,
       row.lang,
+      getTimesEvaluated(row.toxicity),
       getToxicityJSON(row.toxicity),
       getTargetJSON(row.target_type),
       getBiasJSON(row.bias_type),
