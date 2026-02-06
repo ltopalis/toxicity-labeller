@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
 const format = require("pg-format");
+const ExcelJS = require("exceljs");
 
 const allowedOrigins = [
   "http://localhost:3000",
@@ -186,17 +187,38 @@ app.get("/getAllData", async (req, res) => {
       "SELECT text_id, text, toxicity, bias_type, target_type FROM evaluation WHERE times_evaluated != 0";
     const result = await pool.query(sql);
 
-    const processedRows = result.rows.map((row) => {
-      return {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Dataset");
+
+    worksheet.columns = [
+      { header: "text_id", key: "text_id", width: 14 },
+      { header: "text", key: "text", width: 128 },
+      { header: "toxicity", key: "toxicity", width: 10 },
+      { header: "bias_type", key: "bias_type", width: 26.17 },
+      { header: "target_type", key: "target_type", width: 10 },
+    ];
+
+    result.rows.forEach((row) => {
+      worksheet.addRow({
         text_id: row.text_id,
         text: row.text,
         toxicity: extractScore(row.toxicity),
         bias_type: extractScore(row.bias_type),
         target_type: extractScore(row.target_type),
-      };
+      });
     });
 
-    res.json(processedRows);
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=ToxicityExport.xlsx",
+    );
+    await workbook.xlsx.write(res);
+
+    res.end();
   } catch (err) {
     console.error("❌ Error:", err);
     res.status(500).json({ error: "Server Error" });
