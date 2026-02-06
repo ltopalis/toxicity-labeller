@@ -23,7 +23,7 @@ jobs:
           cd desktop-app
 
           xcodebuild -project "desktop-app.xcodeproj" \
-            -scheme "Toxicity Labeller" \
+            -scheme "desktop-app" \
             -configuration Release \
             -archivePath ./build/App.xcarchive \
             archive
