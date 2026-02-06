@@ -34,7 +34,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             archive
 
-          cp -r ./build/App.xcarchive/Products/Applications/*.app ../ToxicityApp.app
+          cp -r ./build/App.xcarchive/Products/Applications/*.app ../Toxicity\ Labeller.app
 
           cd ..
           brew install create-dmg
@@ -43,15 +43,15 @@ jobs:
             --window-pos 200 120 \
             --window-size 800 400 \
             --icon-size 100 \
-            --icon "ToxicityApp.app" 200 190 \
-            --hide-extension "ToxicityApp.app" \
+            --icon "Toxicity Labeller.app" 200 190 \
+            --hide-extension "Toxicity Labeller.app" \
             --app-drop-link 600 185 \
-            "ToxicityApp.dmg" \
-            "ToxicityApp.app"
+            "Toxicity Labeller.dmg" \
+            "Toxicity Labeller.app"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ToxicityApp.dmg # Πλέον ανεβάζουμε το DMG αντί για ZIP
+          files: Toxicity\ Labeller.dmg # Πλέον ανεβάζουμε το DMG αντί για ZIP
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
