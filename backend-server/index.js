@@ -5,8 +5,8 @@ const { Pool } = require("pg");
 const format = require("pg-format");
 
 const allowedOrigins = [
-  "http://localhost:3000/",
-  "https://cosmic-kelpie-b639a3.netlify.app/",
+  "http://localhost:3000",
+  "https://cosmic-kelpie-b639a3.netlify.app",
 ];
 
 const app = express();
