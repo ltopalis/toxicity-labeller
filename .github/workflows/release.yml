@@ -26,6 +26,9 @@ jobs:
             -scheme "desktop-app" \
             -configuration Release \
             -archivePath ./build/App.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
             archive
 
           cp -r ./build/App.xcarchive/Products/Applications/*.app ../ToxicityApp.app
