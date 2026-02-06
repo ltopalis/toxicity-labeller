@@ -1,0 +1,51 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build and Create DMG
+        run: |
+          cd desktop-app
+
+          xcodebuild -project "desktop-app.xcodeproj" \
+            -scheme "Toxicity Labeller" \
+            -configuration Release \
+            -archivePath ./build/App.xcarchive \
+            archive
+
+          cp -r ./build/App.xcarchive/Products/Applications/*.app ../ToxicityApp.app
+
+          cd ..
+          brew install create-dmg
+          create-dmg \
+            --volname "Toxicity App Installer" \
+            --window-pos 200 120 \
+            --window-size 800 400 \
+            --icon-size 100 \
+            --icon "ToxicityApp.app" 200 190 \
+            --hide-extension "ToxicityApp.app" \
+            --app-drop-link 600 185 \
+            "ToxicityApp.dmg" \
+            "ToxicityApp.app"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ToxicityApp.dmg # Πλέον ανεβάζουμε το DMG αντί για ZIP
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
