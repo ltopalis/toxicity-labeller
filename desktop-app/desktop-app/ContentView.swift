@@ -8,6 +8,7 @@ struct ToxicityDataRow: Codable {
     let toxicity: String
     let target_type: String
     let bias_type: String
+    let lang: String
 }
 
 struct ServerStats: Codable {
@@ -120,15 +121,15 @@ struct ContentView: View {
         
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let data = data, let stats = try? JSONDecoder().decode(ServerStats.self, from: data) {
-                // Αποθήκευση των δεδομένων
-                self.lastFetchedStats = stats
-                // Ενημέρωση των labels βάσει του επιλεγμένου φίλτρου
-                updateDisplayStats(with: self.statsLang)
+
+                DispatchQueue.main.async {
+                    self.lastFetchedStats = stats
+                    updateDisplayStats(with: self.statsLang)
+                }
             }
         }.resume()
     }
     
-    // ... (Οι υπόλοιπες συναρτήσεις uploadToServer & selectAndProcessExcel παραμένουν ίδιες)
     
     func uploadToServer(jsonData: Data, count: Int) {
         guard let url = URL(string: "https://toxicity-backend.onrender.com/upload-data") else { return }
@@ -149,42 +150,105 @@ struct ContentView: View {
             }
         }.resume()
     }
+    
+    func safeValue(_ cell: Cell, _ sharedStrings: SharedStrings?) -> String {
+
+        if let sharedStrings = sharedStrings,
+           let value = cell.stringValue(sharedStrings) {
+            return value.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        if let inlineStr = cell.inlineString {
+            if let textRuns = inlineStr.text {
+                let combined = textRuns.map { "\($0)" }.joined()
+                return combined.trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+        }
+
+        if let value = cell.value {
+            return value.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        return ""
+    }
+
+
 
     func selectAndProcessExcel() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [UTType(filenameExtension: "xlsx")!].compactMap { $0 }
+
         if panel.runModal() == .OK {
             guard let url = panel.url else { return }
+
             let accessing = url.startAccessingSecurityScopedResource()
             defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+
             updateStatus("Επεξεργασία...")
+
             DispatchQueue.global(qos: .userInitiated).async {
                 do {
-                    guard let file = XLSXFile(filepath: url.path) else { return }
+                    guard let file = XLSXFile(filepath: url.path) else {
+                        updateStatus("Αδυναμία ανοίγματος αρχείου.")
+                        return
+                    }
+
+                    let sharedStrings = try? file.parseSharedStrings()
                     var rowsToUpload: [ToxicityDataRow] = []
+
                     for path in try file.parseWorksheetPaths() {
                         let worksheet = try file.parseWorksheet(at: path)
-                        if let sharedStrings = try file.parseSharedStrings() {
-                            let columnData = worksheet.data?.rows.dropFirst()
-                            columnData?.forEach { row in
-                                func safeValue(at index: Int) -> String {
-                                    guard row.cells.count > index else { return "" }
-                                    return row.cells[index].stringValue(sharedStrings) ?? ""
-                                }
-                                let tid = safeValue(at: 0)
-                                if !tid.isEmpty {
-                                    rowsToUpload.append(ToxicityDataRow(
-                                        text_id: tid, text: safeValue(at: 1),
-                                         toxicity: safeValue(at: 2),
-                                        target_type: safeValue(at: 4), bias_type: safeValue(at: 3)
-                                    ))
-                                }
-                            }
+
+                        guard let rows = worksheet.data?.rows.dropFirst() else { continue }
+
+                        for row in rows {
+                            let tid = row.cells.indices.contains(0)
+                                ? safeValue(row.cells[0], sharedStrings)
+                                : ""
+
+                            if tid.isEmpty { continue }
+
+                            let text = row.cells.indices.contains(1)
+                                ? safeValue(row.cells[1], sharedStrings)
+                                : ""
+
+                            let toxicity = row.cells.indices.contains(2)
+                                ? safeValue(row.cells[2], sharedStrings)
+                                : ""
+
+                            let biasType = row.cells.indices.contains(3)
+                                ? safeValue(row.cells[3], sharedStrings)
+                                : ""
+
+                            let targetType = row.cells.indices.contains(4)
+                                ? safeValue(row.cells[4], sharedStrings)
+                                : ""
+
+                            rowsToUpload.append(
+                                ToxicityDataRow(
+                                    text_id: tid,
+                                    text: text,
+                                    toxicity: toxicity,
+                                    target_type: targetType,
+                                    bias_type: biasType,
+                                    lang: selectedLanguage
+                                )
+                            )
                         }
                     }
-                    let data = try JSONEncoder().encode(rowsToUpload)
-                    self.uploadToServer(jsonData: data, count: rowsToUpload.count)
-                } catch { updateStatus("Σφάλμα Excel") }
+
+                    guard !rowsToUpload.isEmpty else {
+                        updateStatus("Δεν βρέθηκαν έγκυρες γραμμές.")
+                        return
+                    }
+
+                    let jsonData = try JSONEncoder().encode(rowsToUpload)
+                    self.uploadToServer(jsonData: jsonData, count: rowsToUpload.count)
+
+                } catch {
+                    print(error)
+                    updateStatus("Σφάλμα επεξεργασίας Excel.")
+                }
             }
         }
     }
